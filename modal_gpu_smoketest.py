@@ -2,9 +2,11 @@ import subprocess
 import time
 import modal
 
+image = modal.Image.debian_slim().pip_install("fastapi[standard]")
+
 app = modal.App("wan-pocket-gpu-smoketest")
 
-@app.function()
+@app.function(image=image)
 @modal.fastapi_endpoint(method="GET")
 def health():
     return {
@@ -13,7 +15,7 @@ def health():
         "gpu_requested": False,
     }
 
-@app.function(gpu="T4", timeout=120)
+@app.function(image=image, gpu="T4", timeout=120)
 @modal.fastapi_endpoint(method="GET")
 def gpu():
     started = time.time()
